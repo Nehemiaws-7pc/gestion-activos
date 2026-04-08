@@ -1,0 +1,62 @@
+<div class="page">
+
+  <header class="header">
+    <button (click)="volver()" class="btn-back">← Volver</button>
+    <h1>Registrar Nuevo Activo</h1>
+    <span></span>
+  </header>
+
+  <main class="main">
+    <div class="card">
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Código *</label>
+          <input [(ngModel)]="nuevoActivo.codigo" name="codigo" placeholder="LAP-002">
+        </div>
+        <div class="form-field">
+          <label>Descripción *</label>
+          <input [(ngModel)]="nuevoActivo.descripcion" name="descripcion" placeholder="Laptop Dell XPS 15">
+        </div>
+        <div class="form-field">
+          <label>Valor Adquisición (Q) *</label>
+          <input type="number" [(ngModel)]="nuevoActivo.valorAdquisicion" name="valor" placeholder="8500">
+        </div>
+        <div class="form-field">
+          <label>Fecha de Adquisición</label>
+          <input type="date" [(ngModel)]="nuevoActivo.fechaAdquisicion" name="fecha">
+        </div>
+        <div class="form-field">
+          <label>Ubicación</label>
+          <input [(ngModel)]="nuevoActivo.ubicacionActual" name="ubicacion" placeholder="Bodega Principal">
+        </div>
+        <div class="form-field">
+          <label>Estado</label>
+          <select [(ngModel)]="nuevoActivo.estado" name="estado">
+            <option value="DISPONIBLE">DISPONIBLE</option>
+            <option value="ASIGNADO">ASIGNADO</option>
+            <option value="BAJA">BAJA</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Empleado asignado (opcional)</label>
+          <select [(ngModel)]="nuevoActivo.empleadoCodigo" name="empCodigo">
+            <option value="">— Sin asignar —</option>
+            <option *ngFor="let emp of empleados" [value]="emp.codigo">
+              {{ emp.codigo }} — {{ emp.nombre }} {{ emp.apellido }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button (click)="volver()" class="btn-secondary">Cancelar</button>
+        <button (click)="registrar()" [disabled]="registrando" class="btn-primary">
+          {{ registrando ? 'Registrando...' : 'Registrar Activo' }}
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+</div>

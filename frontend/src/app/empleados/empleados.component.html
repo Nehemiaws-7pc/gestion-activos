@@ -1,0 +1,128 @@
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <button (click)="volver()" class="btn-back">← Volver</button>
+    <h1>Gestión de Empleados</h1>
+    <button (click)="abrirFormNuevo()" class="btn-nuevo">+ Nuevo Empleado</button>
+  </header>
+
+  <main class="main">
+
+    <!-- ── Tabla de empleados ── -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Empleados <span class="count-badge">{{ empleados.length }}</span></h2>
+      </div>
+
+      <div *ngIf="cargando" class="empty-msg">Cargando...</div>
+      <div *ngIf="!cargando && empleados.length === 0" class="empty-msg">No hay empleados registrados.</div>
+
+      <div class="table-wrapper" *ngIf="!cargando && empleados.length > 0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Departamento</th>
+              <th>Cargo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let emp of empleados">
+              <td><strong>{{ emp.codigo }}</strong></td>
+              <td>{{ emp.nombre }}</td>
+              <td>{{ emp.apellido }}</td>
+              <td>{{ emp.departamento }}</td>
+              <td>{{ emp.cargo }}</td>
+              <td class="actions-cell">
+                <button (click)="abrirEditar(emp)" class="btn-edit">Editar</button>
+                <button (click)="eliminar(emp)" class="btn-delete">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- ── Modal Nuevo Empleado ── -->
+<div *ngIf="mostrarFormNuevo" class="modal-overlay" (click)="cancelarNuevo()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Nuevo Empleado</h3>
+      <button (click)="cancelarNuevo()" class="btn-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>Código *</label>
+        <input [(ngModel)]="nuevoEmpleado.codigo" name="nCodigo" placeholder="EMP-010">
+      </div>
+      <div class="form-field">
+        <label>Nombre *</label>
+        <input [(ngModel)]="nuevoEmpleado.nombre" name="nNombre" placeholder="Juan">
+      </div>
+      <div class="form-field">
+        <label>Apellido</label>
+        <input [(ngModel)]="nuevoEmpleado.apellido" name="nApellido" placeholder="Pérez">
+      </div>
+      <div class="form-field">
+        <label>Departamento</label>
+        <input [(ngModel)]="nuevoEmpleado.departamento" name="nDepto" placeholder="TI">
+      </div>
+      <div class="form-field">
+        <label>Cargo</label>
+        <input [(ngModel)]="nuevoEmpleado.cargo" name="nCargo" placeholder="Desarrollador">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button (click)="cancelarNuevo()" class="btn-secondary">Cancelar</button>
+      <button (click)="crear()" [disabled]="creando" class="btn-primary">
+        {{ creando ? 'Creando...' : 'Crear Empleado' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal Editar Empleado ── -->
+<div *ngIf="empleadoEditando" class="modal-overlay" (click)="cerrarEditar()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Editar — {{ empleadoEditando.codigo }}</h3>
+      <button (click)="cerrarEditar()" class="btn-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>Código</label>
+        <input [(ngModel)]="editForm.codigo" name="eCodigo">
+      </div>
+      <div class="form-field">
+        <label>Nombre</label>
+        <input [(ngModel)]="editForm.nombre" name="eNombre">
+      </div>
+      <div class="form-field">
+        <label>Apellido</label>
+        <input [(ngModel)]="editForm.apellido" name="eApellido">
+      </div>
+      <div class="form-field">
+        <label>Departamento</label>
+        <input [(ngModel)]="editForm.departamento" name="eDepto">
+      </div>
+      <div class="form-field">
+        <label>Cargo</label>
+        <input [(ngModel)]="editForm.cargo" name="eCargo">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button (click)="cerrarEditar()" class="btn-secondary">Cancelar</button>
+      <button (click)="guardar()" [disabled]="guardando" class="btn-primary">
+        {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+  </div>
+</div>

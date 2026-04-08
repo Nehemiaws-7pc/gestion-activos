@@ -1,0 +1,28 @@
+<div class="login-container">
+    <div class="login-card">
+        <h2>Gestión de Activos Fijos</h2>
+        <p class="subtitle">Sistema Corporativo</p>
+
+        <form (ngSubmit)="onLogin()">
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" [(ngModel)]="username" name="username" placeholder="Ingresa tu usuario" required>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" [(ngModel)]="password" name="password" placeholder="Ingresa tu contraseña" required>
+            </div>
+
+            <button type="submit" [disabled]="loading" class="btn-login">
+                {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+            </button>
+        </form>
+
+        <div class="demo-info">
+            <small>Credenciales de prueba:</small><br>
+            <strong>Usuario:</strong> admin<br>
+            <strong>Contraseña:</strong> admin123
+        </div>
+    </div>
+</div>

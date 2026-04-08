@@ -1,0 +1,39 @@
+<div class="page">
+
+  <header class="header">
+    <div class="header-left">
+      <h1>Gestión de Activos Fijos</h1>
+    </div>
+    <div class="header-right">
+      <span class="role-badge" [class]="'role-' + rolActual.toLowerCase()">{{ rolActual }}</span>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <h2 class="welcome">Bienvenido — ¿Qué deseas hacer?</h2>
+
+    <div class="menu-grid">
+
+      <div class="menu-card" (click)="irA('/activos/nuevo')">
+        <div class="menu-icon">📦</div>
+        <h3>Registrar Activo</h3>
+        <p>Agrega un nuevo activo fijo al inventario</p>
+      </div>
+
+      <div class="menu-card" (click)="irA('/empleados')">
+        <div class="menu-icon">👤</div>
+        <h3>Gestión de Empleados</h3>
+        <p>Crea, edita o elimina empleados del sistema</p>
+      </div>
+
+      <div class="menu-card" (click)="irA('/activos')">
+        <div class="menu-icon">🔍</div>
+        <h3>Visualizar Activos</h3>
+        <p>Consulta y busca activos registrados</p>
+      </div>
+
+    </div>
+  </main>
+
+</div>

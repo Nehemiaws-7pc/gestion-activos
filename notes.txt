@@ -1,0 +1,11 @@
+##turn on the serve frontend 
+
+cd C:\Users\pnehe\gestion-activos\frontend
+ng serve
+
+##turn on the serve backend
+
+cd C:\Users\pnehe\gestion-activos\backend
+.\mvnw.cmd spring-boot:run
+
+c##trl + c to close any serve

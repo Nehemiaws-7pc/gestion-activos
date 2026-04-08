@@ -1,0 +1,216 @@
+<div class="dashboard">
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <button (click)="volver()" class="btn-back">← Volver</button>
+    <h1>Visualizar Activos</h1>
+    <div class="header-right">
+      <span class="role-badge" [class]="'role-' + rolActual.toLowerCase()">{{ rolActual }}</span>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <!-- ── Búsqueda ── -->
+  <div class="card">
+    <h2>Búsqueda</h2>
+
+    <div class="search-tabs">
+      <button class="tab-btn" [class.active]="searchMode === 'empleado'" (click)="setSearchMode('empleado')">
+        Por Empleado
+      </button>
+      <button class="tab-btn" [class.active]="searchMode === 'activo'" (click)="setSearchMode('activo')">
+        Por Código de Activo
+      </button>
+    </div>
+
+    <div class="search-bar">
+      <input
+        [(ngModel)]="searchCodigo"
+        name="searchCodigo"
+        [placeholder]="searchMode === 'empleado' ? 'Ej: EMP-001' : 'Ej: LAP-001'"
+        (keydown.enter)="buscar()"
+        class="search-input"
+      />
+      <button (click)="buscar()" [disabled]="buscando || !searchCodigo.trim()" class="btn-primary">
+        {{ buscando ? 'Buscando...' : 'Buscar' }}
+      </button>
+      <button *ngIf="hayResultado || errorBusqueda" (click)="limpiarBusqueda(); searchCodigo = ''" class="btn-secondary">
+        Limpiar
+      </button>
+    </div>
+
+    <!-- Error de búsqueda -->
+    <div *ngIf="errorBusqueda" class="search-error">
+      {{ errorBusqueda }}
+    </div>
+
+    <!-- Resultado: Empleado -->
+    <div *ngIf="empleadoEncontrado" class="search-result">
+      <div class="empleado-card">
+        <div class="empleado-header">
+          <span class="emp-code">{{ empleadoEncontrado.codigo }}</span>
+          <span class="emp-name">{{ empleadoEncontrado.nombre }} {{ empleadoEncontrado.apellido }}</span>
+        </div>
+        <div class="empleado-meta">
+          <span><strong>Departamento:</strong> {{ empleadoEncontrado.departamento }}</span>
+          <span><strong>Cargo:</strong> {{ empleadoEncontrado.cargo }}</span>
+        </div>
+      </div>
+
+      <h3 class="section-label">
+        Activos asignados
+        <span class="count-badge">{{ activosEmpleado.length }}</span>
+      </h3>
+
+      <div *ngIf="activosEmpleado.length === 0" class="empty-msg">
+        Este empleado no tiene activos asignados.
+      </div>
+
+      <table *ngIf="activosEmpleado.length > 0" class="table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Valor Actual</th>
+            <th>Estado</th>
+            <th>Ubicación</th>
+            <th *ngIf="puedeEditar">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of activosEmpleado">
+            <td><strong>{{ a.codigo }}</strong></td>
+            <td>{{ a.descripcion }}</td>
+            <td>Q {{ a.valorActual | number:'1.2-2' }}</td>
+            <td><span class="badge" [class]="estadoClass(a.estado)">{{ a.estado }}</span></td>
+            <td>{{ a.ubicacionActual }}</td>
+            <td *ngIf="puedeEditar">
+              <button (click)="abrirEditar(a)" class="btn-edit">Editar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Resultado: Activo -->
+    <div *ngIf="activoEncontrado" class="search-result">
+      <div class="activo-detail-card">
+        <div class="activo-detail-header">
+          <span class="activo-code">{{ activoEncontrado.codigo }}</span>
+          <span class="badge" [class]="estadoClass(activoEncontrado.estado)">
+            {{ activoEncontrado.estado }}
+          </span>
+          <button *ngIf="puedeEditar" (click)="abrirEditar(activoEncontrado)" class="btn-edit">Editar</button>
+        </div>
+        <div class="activo-detail-grid">
+          <div><span class="label">Descripción</span><span>{{ activoEncontrado.descripcion }}</span></div>
+          <div><span class="label">Valor Adquisición</span><span>Q {{ activoEncontrado.valorAdquisicion | number:'1.2-2' }}</span></div>
+          <div><span class="label">Valor Actual</span><span>Q {{ activoEncontrado.valorActual | number:'1.2-2' }}</span></div>
+          <div><span class="label">Fecha Adquisición</span><span>{{ activoEncontrado.fechaAdquisicion }}</span></div>
+          <div><span class="label">Ubicación</span><span>{{ activoEncontrado.ubicacionActual }}</span></div>
+          <div>
+            <span class="label">Asignado a</span>
+            <span *ngIf="activoEncontrado.empleadoCodigo">
+              {{ activoEncontrado.empleadoNombre }} ({{ activoEncontrado.empleadoCodigo }})
+            </span>
+            <span *ngIf="!activoEncontrado.empleadoCodigo" class="text-muted">Sin asignar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Lista completa ── -->
+  <div class="card">
+    <h2>Todos los Activos <span class="count-badge">{{ activos.length }}</span></h2>
+
+    <div *ngIf="cargandoActivos" class="empty-msg">Cargando activos...</div>
+
+    <div *ngIf="!cargandoActivos && activos.length === 0" class="empty-msg">
+      No hay activos registrados.
+    </div>
+
+    <div class="table-wrapper" *ngIf="!cargandoActivos && activos.length > 0">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Valor Adq.</th>
+            <th>Valor Actual</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Ubicación</th>
+            <th>Empleado</th>
+            <th *ngIf="puedeEditar">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of activos">
+            <td><strong>{{ a.codigo }}</strong></td>
+            <td>{{ a.descripcion }}</td>
+            <td>Q {{ a.valorAdquisicion | number:'1.2-2' }}</td>
+            <td>Q {{ a.valorActual | number:'1.2-2' }}</td>
+            <td>{{ a.fechaAdquisicion }}</td>
+            <td><span class="badge" [class]="estadoClass(a.estado)">{{ a.estado }}</span></td>
+            <td>{{ a.ubicacionActual }}</td>
+            <td>
+              <span *ngIf="a.empleadoCodigo" class="emp-chip">
+                {{ a.empleadoCodigo }} — {{ a.empleadoNombre }}
+              </span>
+              <span *ngIf="!a.empleadoCodigo" class="text-muted">—</span>
+            </td>
+            <td *ngIf="puedeEditar">
+              <button (click)="abrirEditar(a)" class="btn-edit">Editar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Modal de Edición ── -->
+<div *ngIf="activoEditando" class="modal-overlay" (click)="cerrarEditar()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Editar Activo — {{ activoEditando.codigo }}</h3>
+      <button (click)="cerrarEditar()" class="btn-close">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-field">
+        <label>Descripción</label>
+        <input [(ngModel)]="editForm.descripcion" name="eDesc">
+      </div>
+      <div class="form-field">
+        <label>Valor Actual (Q)</label>
+        <input type="number" [(ngModel)]="editForm.valorActual" name="eValor">
+      </div>
+      <div class="form-field">
+        <label>Estado</label>
+        <select [(ngModel)]="editForm.estado" name="eEstado">
+          <option value="DISPONIBLE">DISPONIBLE</option>
+          <option value="ASIGNADO">ASIGNADO</option>
+          <option value="BAJA">BAJA</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Ubicación</label>
+        <input [(ngModel)]="editForm.ubicacionActual" name="eUbic">
+      </div>
+      <div class="form-field">
+        <label>Código Empleado asignado</label>
+        <input [(ngModel)]="editForm.empleadoCodigo" name="eEmpCod" placeholder="EMP-001 — vacío para desasignar">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="cerrarEditar()" class="btn-secondary">Cancelar</button>
+      <button (click)="guardarEdicion()" [disabled]="guardando" class="btn-primary">
+        {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+  </div>
+</div>
