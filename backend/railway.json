@@ -5,7 +5,6 @@
     "buildCommand": "./mvnw clean package -DskipTests -B"
   },
   "deploy": {
-    "startCommand": "java -jar target/*.jar",
-    "healthcheckPath": "/"
+    "startCommand": "java -jar target/*.jar"
   }
 }
