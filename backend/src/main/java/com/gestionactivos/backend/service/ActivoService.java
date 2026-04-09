@@ -62,15 +62,16 @@ public class ActivoService {
         activo.setDescripcion(dto.descripcion());
         activo.setValorActual(dto.valorActual());
         activo.setEstado(dto.estado());
-        activo.setUbicacionActual(dto.ubicacionActual());
 
         if (dto.empleadoCodigo() != null && !dto.empleadoCodigo().isBlank()) {
             Empleado emp = empleadoRepository.findByCodigo(dto.empleadoCodigo())
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.BAD_REQUEST, "Empleado no encontrado: " + dto.empleadoCodigo()));
             activo.setEmpleado(emp);
+            activo.setUbicacionActual(emp.getDepartamento());
         } else {
             activo.setEmpleado(null);
+            activo.setUbicacionActual("Bodega Principal");
         }
 
         return toDTO(repository.save(activo));

@@ -67,7 +67,6 @@ export class RegistrarActivoComponent implements OnInit {
             valorAdquisicion: 0,
             fechaAdquisicion: '',
             estado: 'DISPONIBLE',
-            ubicacionActual: 'Bodega Principal',
             empleadoCodigo: ''
         };
     }

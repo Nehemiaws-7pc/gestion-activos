@@ -21,7 +21,6 @@ export interface ActivoUpdate {
     descripcion: string;
     valorActual: number;
     estado: string;
-    ubicacionActual: string;
     empleadoCodigo: string;
 }
 

@@ -159,7 +159,6 @@ export class ActivosListComponent implements OnInit {
             descripcion: activo.descripcion,
             valorActual: activo.valorActual ?? 0,
             estado: activo.estado,
-            ubicacionActual: activo.ubicacionActual,
             empleadoCodigo: activo.empleadoCodigo ?? ''
         };
     }
@@ -210,10 +209,10 @@ export class ActivosListComponent implements OnInit {
     }
 
     private activoVacio(): Partial<Activo> {
-        return { codigo: '', descripcion: '', valorAdquisicion: 0, fechaAdquisicion: '', estado: 'DISPONIBLE', ubicacionActual: 'Bodega Principal' };
+        return { codigo: '', descripcion: '', valorAdquisicion: 0, fechaAdquisicion: '', estado: 'DISPONIBLE' };
     }
 
     private editVacio(): ActivoUpdate {
-        return { descripcion: '', valorActual: 0, estado: 'DISPONIBLE', ubicacionActual: '', empleadoCodigo: '' };
+        return { descripcion: '', valorActual: 0, estado: 'DISPONIBLE', empleadoCodigo: '' };
     }
 }

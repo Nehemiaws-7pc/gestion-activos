@@ -6,6 +6,5 @@ public record ActivoUpdateDTO(
         String descripcion,
         BigDecimal valorActual,
         String estado,
-        String ubicacionActual,
         String empleadoCodigo
 ) {}
