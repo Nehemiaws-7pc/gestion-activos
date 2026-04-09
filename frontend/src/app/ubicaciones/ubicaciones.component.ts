@@ -32,6 +32,11 @@ export class UbicacionesComponent implements OnInit {
     cargandoDetalle = false;
     empleadoExpandido: number | null = null;
 
+    get puedeEditar(): boolean {
+        const role = sessionStorage.getItem('role');
+        return role === 'ADMIN' || role === 'GERENTE';
+    }
+
     constructor(
         private ubicacionService: UbicacionService,
         private router: Router

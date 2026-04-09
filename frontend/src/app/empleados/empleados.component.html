@@ -4,7 +4,7 @@
   <header class="header">
     <button (click)="volver()" class="btn-back">← Volver</button>
     <h1>Gestión de Empleados</h1>
-    <button (click)="abrirFormNuevo()" class="btn-nuevo">+ Nuevo Empleado</button>
+    <button *ngIf="puedeEditar" (click)="abrirFormNuevo()" class="btn-nuevo">+ Nuevo Empleado</button>
   </header>
 
   <main class="main">
@@ -28,7 +28,7 @@
               <th>Departamento</th>
               <th>Cargo</th>
               <th>Ubicación</th>
-              <th>Acciones</th>
+              <th *ngIf="puedeEditar">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -39,7 +39,7 @@
               <td>{{ emp.departamento }}</td>
               <td>{{ emp.cargo }}</td>
               <td>{{ emp.ubicacionNombre || '—' }}</td>
-              <td class="actions-cell">
+              <td *ngIf="puedeEditar" class="actions-cell">
                 <button (click)="abrirEditar(emp)" class="btn-edit">Editar</button>
                 <button (click)="eliminar(emp)" class="btn-delete">Eliminar</button>
               </td>

@@ -29,6 +29,11 @@ export class EmpleadosComponent implements OnInit {
     editForm: Partial<Empleado> = {};
     guardando = false;
 
+    get puedeEditar(): boolean {
+        const role = sessionStorage.getItem('role');
+        return role === 'ADMIN' || role === 'GERENTE';
+    }
+
     constructor(
         private empleadoService: EmpleadoService,
         private ubicacionService: UbicacionService,

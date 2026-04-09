@@ -4,7 +4,7 @@
   <header class="header">
     <button (click)="volver()" class="btn-back">&larr; Volver</button>
     <h1>Gestión de Ubicaciones</h1>
-    <button (click)="abrirFormNuevo()" class="btn-nuevo">+ Nueva Ubicación</button>
+    <button *ngIf="puedeEditar" (click)="abrirFormNuevo()" class="btn-nuevo">+ Nueva Ubicación</button>
   </header>
 
   <main class="main">
@@ -37,8 +37,8 @@
               <td>{{ ub.descripcion }}</td>
               <td class="actions-cell">
                 <button (click)="verDetalle(ub)" class="btn-view">Visualizar</button>
-                <button (click)="abrirEditar(ub)" class="btn-edit">Editar</button>
-                <button (click)="eliminar(ub)" class="btn-delete">Eliminar</button>
+                <button *ngIf="puedeEditar" (click)="abrirEditar(ub)" class="btn-edit">Editar</button>
+                <button *ngIf="puedeEditar" (click)="eliminar(ub)" class="btn-delete">Eliminar</button>
               </td>
             </tr>
           </tbody>
