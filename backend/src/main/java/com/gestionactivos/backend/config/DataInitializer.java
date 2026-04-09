@@ -48,29 +48,37 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedUbicaciones() {
-        if (ubicacionRepository.count() > 0) return;
+        if (ubicacionRepository.count() > 0)
+            return;
 
-        ubicacionRepository.save(buildUbicacion("UBI-001", "Sede Central",       "Av. Principal 123, Ciudad", "Oficina principal de la empresa"));
-        ubicacionRepository.save(buildUbicacion("UBI-002", "Sucursal Norte",     "Calle Norte 456, Ciudad",   "Sucursal zona norte"));
-        ubicacionRepository.save(buildUbicacion("UBI-003", "Data Center",        "Parque Tecnológico 789",    "Centro de datos principal"));
+        ubicacionRepository.save(buildUbicacion("UBI-001", "SALA 1 TI", "Piso 2 de Oficina", "Oficina TI analista"));
+        ubicacionRepository
+                .save(buildUbicacion("UBI-002", "SALA 2 TI", "Piso 1 de Oficina", "Oficina TI desarrolladores"));
+        ubicacionRepository.save(buildUbicacion("UBI-003", "SALA 3 TI", "Piso 3 de Oficina", "Oficina TI testers"));
     }
 
     private void seedEmpleados() {
-        if (empleadoRepository.count() > 0) return;
+        if (empleadoRepository.count() > 0)
+            return;
 
         Ubicacion sedeCentral = ubicacionRepository.findByCodigo("UBI-001").orElse(null);
         Ubicacion sucursalNorte = ubicacionRepository.findByCodigo("UBI-002").orElse(null);
         Ubicacion dataCenter = ubicacionRepository.findByCodigo("UBI-003").orElse(null);
 
-        empleadoRepository.save(buildEmpleado("EMP-001", "Carlos", "Méndez",   "Tecnología",   "Desarrollador Senior", sedeCentral));
-        empleadoRepository.save(buildEmpleado("EMP-002", "Laura",  "Castillo",  "Contabilidad", "Contadora",           sedeCentral));
-        empleadoRepository.save(buildEmpleado("EMP-003", "Diego",  "Ramírez",   "Tecnología",   "Diseñador UX",        sucursalNorte));
-        empleadoRepository.save(buildEmpleado("EMP-004", "Ana",    "González",  "RRHH",         "Gestora de Talento",  sucursalNorte));
-        empleadoRepository.save(buildEmpleado("EMP-005", "Marco",  "Velásquez", "Gerencia",     "Gerente de Proyecto", dataCenter));
+        empleadoRepository
+                .save(buildEmpleado("EMP-001", "Carlos", "Perez", "Tecnología", "Desarrollador Senior", sedeCentral));
+        empleadoRepository
+                .save(buildEmpleado("EMP-002", "Laura", "Castillo", "Contabilidad", "Contadora", sedeCentral));
+        empleadoRepository
+                .save(buildEmpleado("EMP-003", "Diego", "Puebla", "Tecnología", "Diseñador UX", sucursalNorte));
+        empleadoRepository.save(buildEmpleado("EMP-004", "Ana", "López", "RRHH", "Gestora de Talento", sucursalNorte));
+        empleadoRepository
+                .save(buildEmpleado("EMP-005", "Marco", "Rubio", "Gerencia", "Gerente de Proyecto", dataCenter));
     }
 
     private void seedActivos() {
-        if (activoRepository.count() > 0) return;
+        if (activoRepository.count() > 0)
+            return;
 
         Empleado emp1 = empleadoRepository.findByCodigo("EMP-001").orElseThrow();
         Empleado emp2 = empleadoRepository.findByCodigo("EMP-002").orElseThrow();
@@ -127,7 +135,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private Empleado buildEmpleado(String codigo, String nombre, String apellido,
-                                   String departamento, String cargo, Ubicacion ubicacion) {
+            String departamento, String cargo, Ubicacion ubicacion) {
         Empleado e = new Empleado();
         e.setCodigo(codigo);
         e.setNombre(nombre);
@@ -139,9 +147,9 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private Activo buildActivo(String codigo, String descripcion,
-                               BigDecimal valorAdq, BigDecimal valorActual,
-                               LocalDate fecha, String estado,
-                               String ubicacion, Empleado empleado) {
+            BigDecimal valorAdq, BigDecimal valorActual,
+            LocalDate fecha, String estado,
+            String ubicacion, Empleado empleado) {
         Activo a = new Activo();
         a.setCodigo(codigo);
         a.setDescripcion(descripcion);
