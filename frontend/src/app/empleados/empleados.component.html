@@ -27,6 +27,7 @@
               <th>Apellido</th>
               <th>Departamento</th>
               <th>Cargo</th>
+              <th>Ubicación</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -37,6 +38,7 @@
               <td>{{ emp.apellido }}</td>
               <td>{{ emp.departamento }}</td>
               <td>{{ emp.cargo }}</td>
+              <td>{{ emp.ubicacionNombre || '—' }}</td>
               <td class="actions-cell">
                 <button (click)="abrirEditar(emp)" class="btn-edit">Editar</button>
                 <button (click)="eliminar(emp)" class="btn-delete">Eliminar</button>
@@ -79,6 +81,13 @@
         <label>Cargo</label>
         <input [(ngModel)]="nuevoEmpleado.cargo" name="nCargo" placeholder="Desarrollador">
       </div>
+      <div class="form-field">
+        <label>Ubicación</label>
+        <select [(ngModel)]="nuevoEmpleado.ubicacionId" name="nUbicacion">
+          <option [ngValue]="null">— Sin asignar —</option>
+          <option *ngFor="let ub of ubicaciones" [ngValue]="ub.id">{{ ub.nombre }}</option>
+        </select>
+      </div>
     </div>
     <div class="modal-footer">
       <button (click)="cancelarNuevo()" class="btn-secondary">Cancelar</button>
@@ -116,6 +125,13 @@
       <div class="form-field">
         <label>Cargo</label>
         <input [(ngModel)]="editForm.cargo" name="eCargo">
+      </div>
+      <div class="form-field">
+        <label>Ubicación</label>
+        <select [(ngModel)]="editForm.ubicacionId" name="eUbicacion">
+          <option [ngValue]="null">— Sin asignar —</option>
+          <option *ngFor="let ub of ubicaciones" [ngValue]="ub.id">{{ ub.nombre }}</option>
+        </select>
       </div>
     </div>
     <div class="modal-footer">

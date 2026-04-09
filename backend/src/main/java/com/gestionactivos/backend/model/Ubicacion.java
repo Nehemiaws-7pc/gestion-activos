@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "empleados")
+@Table(name = "ubicaciones")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Empleado {
+public class Ubicacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,11 +21,6 @@ public class Empleado {
     @Column(nullable = false)
     private String nombre;
 
-    private String apellido;
-    private String departamento;
-    private String cargo;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ubicacion_id")
-    private Ubicacion ubicacion;
+    private String direccion;
+    private String descripcion;
 }

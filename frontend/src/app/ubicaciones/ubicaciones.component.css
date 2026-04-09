@@ -54,7 +54,7 @@
 /* ── Main ── */
 .main {
   padding: 28px 32px;
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
@@ -117,6 +117,10 @@
 
 .table tr:hover td { background: #fafbff; }
 
+.table-sm { font-size: .82rem; }
+.table-sm th { padding: 8px 10px; }
+.table-sm td { padding: 8px 10px; }
+
 .actions-cell {
   display: flex;
   gap: 8px;
@@ -128,7 +132,23 @@
   padding: 12px 0;
 }
 
+.empty-msg.small { font-size: .82rem; padding: 8px 0; }
+
 /* ── Botones tabla ── */
+.btn-view {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.btn-view:hover { background: #2e7d32; color: #fff; }
+
 .btn-edit {
   background: #e3f2fd;
   color: #1565c0;
@@ -178,6 +198,13 @@
   overflow: hidden;
 }
 
+.modal-wide {
+  max-width: 800px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .modal-header {
   background: #1a237e;
   color: #fff;
@@ -188,6 +215,15 @@
 }
 
 .modal-header h3 { margin: 0; font-size: 1rem; }
+
+.detalle-header { align-items: flex-start; }
+
+.detalle-sub {
+  font-size: .8rem;
+  opacity: .8;
+  margin-top: 2px;
+  display: block;
+}
 
 .btn-close {
   background: transparent;
@@ -207,6 +243,11 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.detalle-body {
+  overflow-y: auto;
+  gap: 16px;
 }
 
 .modal-footer {
@@ -230,18 +271,15 @@
   color: #546e7a;
 }
 
-.form-field input,
-.form-field select {
+.form-field input {
   padding: 10px 12px;
   border: 1.5px solid #cfd8dc;
   border-radius: 7px;
   font-size: .92rem;
   transition: border-color .2s;
-  background: #fff;
 }
 
-.form-field input:focus,
-.form-field select:focus {
+.form-field input:focus {
   outline: none;
   border-color: #3949ab;
 }
@@ -275,3 +313,99 @@
 }
 
 .btn-secondary:hover { background: #cfd8dc; }
+
+/* ── Detalle: Empleados accordion ── */
+.detalle-desc {
+  color: #546e7a;
+  font-size: .9rem;
+  margin: 0;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.section-title {
+  font-size: .95rem;
+  color: #1a237e;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emp-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.emp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background .15s;
+  background: #fafafa;
+}
+
+.emp-header:hover { background: #f0f0f0; }
+
+.emp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.emp-info strong {
+  font-size: .92rem;
+  color: #263238;
+}
+
+.emp-meta {
+  font-size: .78rem;
+  color: #78909c;
+}
+
+.emp-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activos-count {
+  font-size: .78rem;
+  color: #3949ab;
+  font-weight: 600;
+  background: #e8eaf6;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.arrow {
+  font-size: .7rem;
+  color: #90a4ae;
+  transition: transform .2s;
+}
+
+.arrow-open { transform: rotate(180deg); }
+
+.emp-activos {
+  padding: 12px 16px;
+  border-top: 1px solid #e0e0e0;
+  background: #fff;
+}
+
+/* ── Estado badges ── */
+.estado-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.estado-asignado  { background: #fff3e0; color: #e65100; }
+.estado-disponible { background: #e8f5e9; color: #2e7d32; }
+.estado-baja       { background: #fce4ec; color: #c62828; }

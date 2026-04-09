@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EmpleadoService, Empleado } from '../core/services/empleado.service';
+import { UbicacionService, Ubicacion } from '../core/services/ubicacion.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -15,6 +16,7 @@ import Swal from 'sweetalert2';
 export class EmpleadosComponent implements OnInit {
 
     empleados: Empleado[] = [];
+    ubicaciones: Ubicacion[] = [];
     cargando = false;
 
     // Formulario nuevo
@@ -29,11 +31,19 @@ export class EmpleadosComponent implements OnInit {
 
     constructor(
         private empleadoService: EmpleadoService,
+        private ubicacionService: UbicacionService,
         private router: Router
     ) { }
 
     ngOnInit() {
         this.cargar();
+        this.cargarUbicaciones();
+    }
+
+    cargarUbicaciones() {
+        this.ubicacionService.getAll().subscribe({
+            next: data => this.ubicaciones = data
+        });
     }
 
     cargar() {
@@ -134,6 +144,6 @@ export class EmpleadosComponent implements OnInit {
     }
 
     private empleadoVacio(): Partial<Empleado> {
-        return { codigo: '', nombre: '', apellido: '', departamento: '', cargo: '' };
+        return { codigo: '', nombre: '', apellido: '', departamento: '', cargo: '', ubicacionId: null };
     }
 }

@@ -6,5 +6,7 @@ public record EmpleadoDTO(
         String nombre,
         String apellido,
         String departamento,
-        String cargo
+        String cargo,
+        Long ubicacionId,
+        String ubicacionNombre
 ) {}

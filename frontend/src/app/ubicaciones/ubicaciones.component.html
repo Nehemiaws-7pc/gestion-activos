@@ -1,0 +1,185 @@
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <button (click)="volver()" class="btn-back">&larr; Volver</button>
+    <h1>Gestión de Ubicaciones</h1>
+    <button (click)="abrirFormNuevo()" class="btn-nuevo">+ Nueva Ubicación</button>
+  </header>
+
+  <main class="main">
+
+    <!-- Tabla de ubicaciones -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Ubicaciones <span class="count-badge">{{ ubicaciones.length }}</span></h2>
+      </div>
+
+      <div *ngIf="cargando" class="empty-msg">Cargando...</div>
+      <div *ngIf="!cargando && ubicaciones.length === 0" class="empty-msg">No hay ubicaciones registradas.</div>
+
+      <div class="table-wrapper" *ngIf="!cargando && ubicaciones.length > 0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Dirección</th>
+              <th>Descripción</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ub of ubicaciones">
+              <td><strong>{{ ub.codigo }}</strong></td>
+              <td>{{ ub.nombre }}</td>
+              <td>{{ ub.direccion }}</td>
+              <td>{{ ub.descripcion }}</td>
+              <td class="actions-cell">
+                <button (click)="verDetalle(ub)" class="btn-view">Visualizar</button>
+                <button (click)="abrirEditar(ub)" class="btn-edit">Editar</button>
+                <button (click)="eliminar(ub)" class="btn-delete">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- Modal Nueva Ubicación -->
+<div *ngIf="mostrarFormNuevo" class="modal-overlay" (click)="cancelarNuevo()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Nueva Ubicación</h3>
+      <button (click)="cancelarNuevo()" class="btn-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>Código *</label>
+        <input [(ngModel)]="nuevaUbicacion.codigo" name="nCodigo" placeholder="UBI-004">
+      </div>
+      <div class="form-field">
+        <label>Nombre *</label>
+        <input [(ngModel)]="nuevaUbicacion.nombre" name="nNombre" placeholder="Sucursal Sur">
+      </div>
+      <div class="form-field">
+        <label>Dirección</label>
+        <input [(ngModel)]="nuevaUbicacion.direccion" name="nDireccion" placeholder="Calle Sur 789">
+      </div>
+      <div class="form-field">
+        <label>Descripción</label>
+        <input [(ngModel)]="nuevaUbicacion.descripcion" name="nDescripcion" placeholder="Oficina zona sur">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button (click)="cancelarNuevo()" class="btn-secondary">Cancelar</button>
+      <button (click)="crear()" [disabled]="creando" class="btn-primary">
+        {{ creando ? 'Creando...' : 'Crear Ubicación' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Ubicación -->
+<div *ngIf="ubicacionEditando" class="modal-overlay" (click)="cerrarEditar()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Editar — {{ ubicacionEditando.codigo }}</h3>
+      <button (click)="cerrarEditar()" class="btn-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>Código</label>
+        <input [(ngModel)]="editForm.codigo" name="eCodigo">
+      </div>
+      <div class="form-field">
+        <label>Nombre</label>
+        <input [(ngModel)]="editForm.nombre" name="eNombre">
+      </div>
+      <div class="form-field">
+        <label>Dirección</label>
+        <input [(ngModel)]="editForm.direccion" name="eDireccion">
+      </div>
+      <div class="form-field">
+        <label>Descripción</label>
+        <input [(ngModel)]="editForm.descripcion" name="eDescripcion">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button (click)="cerrarEditar()" class="btn-secondary">Cancelar</button>
+      <button (click)="guardar()" [disabled]="guardando" class="btn-primary">
+        {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalle de Ubicación -->
+<div *ngIf="detalle" class="modal-overlay" (click)="cerrarDetalle()">
+  <div class="modal-card modal-wide" (click)="$event.stopPropagation()">
+    <div class="modal-header detalle-header">
+      <div>
+        <h3>{{ detalle.nombre }}</h3>
+        <span class="detalle-sub">{{ detalle.codigo }} — {{ detalle.direccion }}</span>
+      </div>
+      <button (click)="cerrarDetalle()" class="btn-close">&times;</button>
+    </div>
+    <div class="modal-body detalle-body">
+
+      <p *ngIf="detalle.descripcion" class="detalle-desc">{{ detalle.descripcion }}</p>
+
+      <h4 class="section-title">
+        Personas en esta ubicación
+        <span class="count-badge">{{ detalle.empleados.length }}</span>
+      </h4>
+
+      <div *ngIf="detalle.empleados.length === 0" class="empty-msg">
+        No hay empleados asignados a esta ubicación.
+      </div>
+
+      <div *ngFor="let emp of detalle.empleados" class="emp-card">
+        <div class="emp-header" (click)="toggleEmpleado(emp.id)">
+          <div class="emp-info">
+            <strong>{{ emp.nombre }} {{ emp.apellido }}</strong>
+            <span class="emp-meta">{{ emp.codigo }} · {{ emp.departamento }} · {{ emp.cargo }}</span>
+          </div>
+          <div class="emp-toggle">
+            <span class="activos-count">{{ emp.activos.length }} activo(s)</span>
+            <span class="arrow" [class.arrow-open]="empleadoExpandido === emp.id">&#9660;</span>
+          </div>
+        </div>
+
+        <div *ngIf="empleadoExpandido === emp.id" class="emp-activos">
+          <div *ngIf="emp.activos.length === 0" class="empty-msg small">
+            Sin activos asignados.
+          </div>
+          <table *ngIf="emp.activos.length > 0" class="table table-sm">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Valor Actual</th>
+                <th>Estado</th>
+                <th>Ubicación del Activo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let act of emp.activos">
+                <td><strong>{{ act.codigo }}</strong></td>
+                <td>{{ act.descripcion }}</td>
+                <td>{{ act.valorActual | number:'1.2-2' }}</td>
+                <td><span class="estado-badge" [class]="estadoClass(act.estado)">{{ act.estado }}</span></td>
+                <td>{{ act.ubicacionActual }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

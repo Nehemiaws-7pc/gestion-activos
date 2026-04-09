@@ -3,9 +3,11 @@ package com.gestionactivos.backend.config;
 import com.gestionactivos.backend.model.Activo;
 import com.gestionactivos.backend.model.Empleado;
 import com.gestionactivos.backend.model.Role;
+import com.gestionactivos.backend.model.Ubicacion;
 import com.gestionactivos.backend.model.User;
 import com.gestionactivos.backend.repository.ActivoRepository;
 import com.gestionactivos.backend.repository.EmpleadoRepository;
+import com.gestionactivos.backend.repository.UbicacionRepository;
 import com.gestionactivos.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -23,10 +25,12 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final EmpleadoRepository empleadoRepository;
     private final ActivoRepository activoRepository;
+    private final UbicacionRepository ubicacionRepository;
 
     @Override
     public void run(String... args) {
         seedUsers();
+        seedUbicaciones();
         seedEmpleados();
         seedActivos();
     }
@@ -43,14 +47,26 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
+    private void seedUbicaciones() {
+        if (ubicacionRepository.count() > 0) return;
+
+        ubicacionRepository.save(buildUbicacion("UBI-001", "Sede Central",       "Av. Principal 123, Ciudad", "Oficina principal de la empresa"));
+        ubicacionRepository.save(buildUbicacion("UBI-002", "Sucursal Norte",     "Calle Norte 456, Ciudad",   "Sucursal zona norte"));
+        ubicacionRepository.save(buildUbicacion("UBI-003", "Data Center",        "Parque Tecnológico 789",    "Centro de datos principal"));
+    }
+
     private void seedEmpleados() {
         if (empleadoRepository.count() > 0) return;
 
-        empleadoRepository.save(buildEmpleado("EMP-001", "Carlos", "Méndez",   "Tecnología",   "Desarrollador Senior"));
-        empleadoRepository.save(buildEmpleado("EMP-002", "Laura",  "Castillo",  "Contabilidad", "Contadora"));
-        empleadoRepository.save(buildEmpleado("EMP-003", "Diego",  "Ramírez",   "Tecnología",   "Diseñador UX"));
-        empleadoRepository.save(buildEmpleado("EMP-004", "Ana",    "González",  "RRHH",         "Gestora de Talento"));
-        empleadoRepository.save(buildEmpleado("EMP-005", "Marco",  "Velásquez", "Gerencia",     "Gerente de Proyecto"));
+        Ubicacion sedeCentral = ubicacionRepository.findByCodigo("UBI-001").orElse(null);
+        Ubicacion sucursalNorte = ubicacionRepository.findByCodigo("UBI-002").orElse(null);
+        Ubicacion dataCenter = ubicacionRepository.findByCodigo("UBI-003").orElse(null);
+
+        empleadoRepository.save(buildEmpleado("EMP-001", "Carlos", "Méndez",   "Tecnología",   "Desarrollador Senior", sedeCentral));
+        empleadoRepository.save(buildEmpleado("EMP-002", "Laura",  "Castillo",  "Contabilidad", "Contadora",           sedeCentral));
+        empleadoRepository.save(buildEmpleado("EMP-003", "Diego",  "Ramírez",   "Tecnología",   "Diseñador UX",        sucursalNorte));
+        empleadoRepository.save(buildEmpleado("EMP-004", "Ana",    "González",  "RRHH",         "Gestora de Talento",  sucursalNorte));
+        empleadoRepository.save(buildEmpleado("EMP-005", "Marco",  "Velásquez", "Gerencia",     "Gerente de Proyecto", dataCenter));
     }
 
     private void seedActivos() {
@@ -101,14 +117,24 @@ public class DataInitializer implements CommandLineRunner {
         return u;
     }
 
+    private Ubicacion buildUbicacion(String codigo, String nombre, String direccion, String descripcion) {
+        Ubicacion u = new Ubicacion();
+        u.setCodigo(codigo);
+        u.setNombre(nombre);
+        u.setDireccion(direccion);
+        u.setDescripcion(descripcion);
+        return u;
+    }
+
     private Empleado buildEmpleado(String codigo, String nombre, String apellido,
-                                   String departamento, String cargo) {
+                                   String departamento, String cargo, Ubicacion ubicacion) {
         Empleado e = new Empleado();
         e.setCodigo(codigo);
         e.setNombre(nombre);
         e.setApellido(apellido);
         e.setDepartamento(departamento);
         e.setCargo(cargo);
+        e.setUbicacion(ubicacion);
         return e;
     }
 

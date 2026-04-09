@@ -3,8 +3,10 @@ package com.gestionactivos.backend.service;
 import com.gestionactivos.backend.dto.ActivoDTO;
 import com.gestionactivos.backend.dto.EmpleadoDTO;
 import com.gestionactivos.backend.model.Empleado;
+import com.gestionactivos.backend.model.Ubicacion;
 import com.gestionactivos.backend.repository.ActivoRepository;
 import com.gestionactivos.backend.repository.EmpleadoRepository;
+import com.gestionactivos.backend.repository.UbicacionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ public class EmpleadoService {
     private final EmpleadoRepository empleadoRepository;
     private final ActivoRepository activoRepository;
     private final ActivoService activoService;
+    private final UbicacionRepository ubicacionRepository;
 
     public List<EmpleadoDTO> listarTodos() {
         return empleadoRepository.findAll().stream().map(this::toDTO).toList();
@@ -80,11 +83,22 @@ public class EmpleadoService {
         e.setApellido(dto.apellido());
         e.setDepartamento(dto.departamento());
         e.setCargo(dto.cargo());
+
+        if (dto.ubicacionId() != null) {
+            Ubicacion ub = ubicacionRepository.findById(dto.ubicacionId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ubicación no encontrada"));
+            e.setUbicacion(ub);
+        } else {
+            e.setUbicacion(null);
+        }
     }
 
     public EmpleadoDTO toDTO(Empleado e) {
+        Ubicacion ub = e.getUbicacion();
         return new EmpleadoDTO(e.getId(), e.getCodigo(), e.getNombre(),
-                e.getApellido(), e.getDepartamento(), e.getCargo());
+                e.getApellido(), e.getDepartamento(), e.getCargo(),
+                ub != null ? ub.getId() : null,
+                ub != null ? ub.getNombre() : null);
     }
 
     private Empleado findOrThrow(String codigo) {

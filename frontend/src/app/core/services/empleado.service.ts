@@ -10,6 +10,8 @@ export interface Empleado {
     apellido: string;
     departamento: string;
     cargo: string;
+    ubicacionId?: number | null;
+    ubicacionNombre?: string;
 }
 
 @Injectable({
