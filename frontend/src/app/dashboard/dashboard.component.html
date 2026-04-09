@@ -15,7 +15,7 @@
 
     <div class="menu-grid">
 
-      <div class="menu-card" (click)="irA('/activos/nuevo')">
+      <div *ngIf="puedeEditar" class="menu-card" (click)="irA('/activos/nuevo')">
         <div class="menu-icon">📦</div>
         <h3>Registrar Activo</h3>
         <p>Agrega un nuevo activo fijo al inventario</p>
@@ -23,8 +23,8 @@
 
       <div class="menu-card" (click)="irA('/empleados')">
         <div class="menu-icon">👤</div>
-        <h3>Gestión de Empleados</h3>
-        <p>Crea, edita o elimina empleados del sistema</p>
+        <h3>{{ puedeEditar ? 'Gestión de Empleados' : 'Ver Empleados' }}</h3>
+        <p>{{ puedeEditar ? 'Crea, edita o elimina empleados del sistema' : 'Consulta los empleados registrados' }}</p>
       </div>
 
       <div class="menu-card" (click)="irA('/activos')">
@@ -35,8 +35,8 @@
 
       <div class="menu-card" (click)="irA('/ubicaciones')">
         <div class="menu-icon">📍</div>
-        <h3>Ubicaciones</h3>
-        <p>Gestiona ubicaciones y visualiza personas y activos por sede</p>
+        <h3>{{ puedeEditar ? 'Gestión de Ubicaciones' : 'Ver Ubicaciones' }}</h3>
+        <p>{{ puedeEditar ? 'Gestiona ubicaciones y visualiza personas y activos por sede' : 'Consulta ubicaciones, personas y activos por sede' }}</p>
       </div>
 
     </div>
