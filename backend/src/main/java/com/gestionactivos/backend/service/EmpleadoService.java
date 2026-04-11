@@ -38,6 +38,20 @@ public class EmpleadoService {
                 .toList();
     }
 
+    @org.springframework.transaction.annotation.Transactional
+    public List<EmpleadoDTO> crearBatch(List<EmpleadoDTO> dtos) {
+        List<Empleado> empleados = new java.util.ArrayList<>();
+        for (EmpleadoDTO dto : dtos) {
+            if (empleadoRepository.findByCodigo(dto.codigo()).isPresent()) {
+                continue; // omitir duplicados
+            }
+            Empleado e = new Empleado();
+            mapFields(e, dto);
+            empleados.add(e);
+        }
+        return empleadoRepository.saveAll(empleados).stream().map(this::toDTO).toList();
+    }
+
     public EmpleadoDTO crear(EmpleadoDTO dto) {
         if (empleadoRepository.findByCodigo(dto.codigo()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,

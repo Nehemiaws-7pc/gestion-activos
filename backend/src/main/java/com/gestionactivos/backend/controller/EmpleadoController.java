@@ -39,6 +39,13 @@ public class EmpleadoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(dto));
     }
 
+    @PostMapping("/batch")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    public ResponseEntity<List<EmpleadoDTO>> crearBatch(@RequestBody List<EmpleadoDTO> dtos) {
+        List<EmpleadoDTO> creados = service.crearBatch(dtos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creados);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
     public ResponseEntity<EmpleadoDTO> actualizar(@PathVariable Long id, @RequestBody EmpleadoDTO dto) {
