@@ -34,7 +34,7 @@ public class EmpleadoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
     public ResponseEntity<EmpleadoDTO> crear(@RequestBody EmpleadoDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(dto));
     }
