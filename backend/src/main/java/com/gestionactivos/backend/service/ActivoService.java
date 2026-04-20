@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -90,7 +92,10 @@ public class ActivoService {
                 a.getUbicacionActual(),
                 emp != null ? emp.getId() : null,
                 emp != null ? emp.getCodigo() : null,
-                emp != null ? emp.getNombre() + " " + emp.getApellido() : null
-        );
+                emp != null ? emp.getNombre() + " " + emp.getApellido() : null);
+    }
+
+    public Page<ActivoDTO> listarPaginado(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toDTO);
     }
 }

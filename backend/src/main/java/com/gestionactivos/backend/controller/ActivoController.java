@@ -7,6 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import com.gestionactivos.backend.util.QrUtil;
+import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -16,6 +21,7 @@ import java.util.List;
 public class ActivoController {
 
     private final ActivoService service;
+    private final QrUtil qrUtil;
 
     @PostMapping
     public ResponseEntity<ActivoDTO> crear(@RequestBody ActivoDTO dto) {
@@ -30,6 +36,26 @@ public class ActivoController {
     @GetMapping("/buscar")
     public ResponseEntity<ActivoDTO> buscar(@RequestParam String codigo) {
         return ResponseEntity.ok(service.buscarPorCodigo(codigo));
+    }
+
+    @GetMapping(value = "/{codigo}/qr", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> generarQr(@PathVariable String codigo) {
+        try {
+            // Verifica que el activo existe antes de generar el QR
+            service.buscarPorCodigo(codigo);
+            byte[] qr = qrUtil.generarQr("ACT:" + codigo, 300);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(qr);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/paginado")
+    public ResponseEntity<Page<ActivoDTO>> listarPaginado(
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(service.listarPaginado(pageable));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")

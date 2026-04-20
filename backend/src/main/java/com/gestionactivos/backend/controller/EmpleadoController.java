@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.gestionactivos.backend.util.QrUtil;
+import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class EmpleadoController {
 
     private final EmpleadoService service;
+    private final QrUtil qrUtil;
 
     @GetMapping
     public ResponseEntity<List<EmpleadoDTO>> listarTodos() {
@@ -31,6 +34,19 @@ public class EmpleadoController {
     @GetMapping("/{codigo}/activos")
     public ResponseEntity<List<ActivoDTO>> getActivos(@PathVariable String codigo) {
         return ResponseEntity.ok(service.getActivosDeEmpleado(codigo));
+    }
+
+    @GetMapping(value = "/{codigo}/qr", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> generarQr(@PathVariable String codigo) {
+        try {
+            service.buscarPorCodigo(codigo);
+            byte[] qr = qrUtil.generarQr("EMP:" + codigo, 300);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(qr);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping

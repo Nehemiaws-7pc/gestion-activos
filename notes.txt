@@ -9,3 +9,54 @@ cd C:\Users\pnehe\gestion-activos\backend
 .\mvnw.cmd spring-boot:run
 
 c##trl + c to close any serve
+
+
+ 1. Levantar los servicios (en 2 terminales)                                                                                                                                                                                                                                                 
+  # Terminal 1 — Backend principal (puerto 8080)                                                                                               
+  cd C:\Users\pnehe\gestion-activos\backend
+  .\mvnw.cmd spring-boot:run
+
+  # Terminal 2 — Stress-service (puerto 8081)
+  cd C:\Users\pnehe\gestion-activos\stress-service
+  .\mvnw.cmd spring-boot:run
+
+  Verifica que ambos arranquen sin errores antes de continuar.
+
+  2. Health check en Postman
+
+  - Método: GET
+  - URL: http://localhost:8081/stress/health
+  - Respuesta esperada: {"status":"UP","service":"stress-service"}
+
+  3. Cargar tu nombre en la tabla empleados (requisito individual)
+
+  - Método: POST
+  - URL: http://localhost:8081/stress/nehemias
+  - Body: ninguno
+  - Inserta un registro con nombre="Nehemias", apellido="Perez", codigo="EMP-NEH-001".
+
+  4. Carga masiva de estrés (1000–5000 registros)
+
+  - Método: POST
+  - URL: http://localhost:8081/stress/carga?cantidad=1000 (cambia a 3000 o 5000 según lo que quieras probar)
+  - Body: ninguno
+  - Respuesta: JSON con solicitados, creados, omitidos, duracionMs, promedioMs.
+
+  Internamente envía en lotes de 100 a POST /api/empleados/batch usando el token JWT de admin.
+
+  5. Verificar los datos cargados
+
+  - Método: GET
+  - URL: http://localhost:8081/stress/empleados
+  - Lista todos los empleados (incluye tu registro EMP-NEH-001 y los STRESS-00001…STRESS-0XXXX).
+
+  6. (Recomendado) Prueba de estrés real con Postman Runner
+
+  Para medir carga concurrente, en Postman:
+  1. Crea una Collection con el request del paso 4.
+  2. Abre Runner → selecciona la collection → Iterations = 5, Delay = 0 ms.
+  3. Ejecuta: lanzará 5 cargas consecutivas de 1000 (5000 totales) y verás tiempos por iteración.
+
+  Tabla impactada
+
+  Todos los inserts caen en la tabla empleados del backend, con tu nombre presente en el registro del paso 3.
