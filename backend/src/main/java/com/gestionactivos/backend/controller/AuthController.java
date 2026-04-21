@@ -11,13 +11,17 @@ import com.gestionactivos.backend.model.User;
 import com.gestionactivos.backend.repository.UserRepository;
 import com.gestionactivos.backend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -30,21 +34,34 @@ public class AuthController {
     private static final long REFRESH_EXPIRATION_MS = 30L * 24 * 60 * 60 * 1000;
 
     @PostMapping("/login")
+    @Transactional
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        Optional<User> userOpt = userRepository.findByUsername(request.username());
+        String username = request.username();
+        log.info("Login attempt for username='{}'", username);
 
-        if (userOpt.isEmpty() || !passwordEncoder.matches(request.password(), userOpt.get().getPassword())) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+
+        if (userOpt.isEmpty()) {
+            log.warn("Login failed: username='{}' not found in database", username);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         User user = userOpt.get();
+        boolean matches = passwordEncoder.matches(request.password(), user.getPassword());
+        if (!matches) {
+            log.warn("Login failed: password mismatch for username='{}'", username);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        limpiarRefreshTokensExpirados();
+
         String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
         RefreshToken refreshToken = crearRefreshToken(user);
+        log.info("Login success for username='{}' role='{}'", username, user.getRole());
         return ResponseEntity.ok(new AuthResponse(token, user.getRole().name(), refreshToken.getToken()));
     }
 
     private RefreshToken crearRefreshToken(User user) {
-        refreshTokenRepository.deleteByUser(user); // invalida el anterior
         RefreshToken rt = new RefreshToken();
         rt.setToken(UUID.randomUUID().toString());
         rt.setUser(user);
@@ -52,10 +69,19 @@ public class AuthController {
         return refreshTokenRepository.save(rt);
     }
 
+    private void limpiarRefreshTokensExpirados() {
+        try {
+            refreshTokenRepository.deleteByExpiracionBefore(Instant.now());
+        } catch (Exception e) {
+            log.warn("No se pudieron limpiar refresh tokens expirados: {}", e.getMessage());
+        }
+    }
+
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody java.util.Map<String, String> body) {
-        String tokenStr = body.get("refreshToken");
-        if (tokenStr == null)
+    @Transactional
+    public ResponseEntity<?> refresh(@RequestBody Map<String, String> body) {
+        String tokenStr = body != null ? body.get("refreshToken") : null;
+        if (tokenStr == null || tokenStr.isBlank())
             return ResponseEntity.badRequest().build();
 
         return refreshTokenRepository.findByToken(tokenStr)
@@ -72,11 +98,16 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody java.util.Map<String, String> body) {
-        String tokenStr = body.get("refreshToken");
-        if (tokenStr != null) {
-            refreshTokenRepository.findByToken(tokenStr)
-                    .ifPresent(refreshTokenRepository::delete);
+    @Transactional
+    public ResponseEntity<Void> logout(@RequestBody(required = false) Map<String, String> body) {
+        String tokenStr = body != null ? body.get("refreshToken") : null;
+        if (tokenStr != null && !tokenStr.isBlank()) {
+            try {
+                refreshTokenRepository.findByToken(tokenStr)
+                        .ifPresent(refreshTokenRepository::delete);
+            } catch (Exception e) {
+                log.warn("Fallo al eliminar refresh token en logout: {}", e.getMessage());
+            }
         }
         return ResponseEntity.ok().build();
     }
