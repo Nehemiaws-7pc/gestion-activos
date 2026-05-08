@@ -20,5 +20,7 @@ ENV PORT=8080
 EXPOSE 8080
 
 COPY --from=build /app/target/*.jar app.jar
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-ENTRYPOINT ["sh","-c","java -Dserver.port=${PORT} -jar /app/app.jar"]
+ENTRYPOINT ["/app/entrypoint.sh"]
