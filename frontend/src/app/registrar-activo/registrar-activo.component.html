@@ -28,16 +28,15 @@
         </div>
         <div class="form-field">
           <label>Estado</label>
-          <select [(ngModel)]="nuevoActivo.estado" name="estado">
-            <option value="DISPONIBLE">DISPONIBLE</option>
-            <option value="ASIGNADO">ASIGNADO</option>
-            <option value="BAJA">BAJA</option>
+          <select [ngModel]="nuevoActivo.estado" (ngModelChange)="onEstadoChange($event)" name="estado">
+            <option value="DISPONIBLE">No asignar (Disponible)</option>
+            <option value="ASIGNADO">Asignar</option>
           </select>
         </div>
-        <div class="form-field">
-          <label>Empleado asignado (opcional)</label>
+        <div class="form-field" *ngIf="nuevoActivo.estado === 'ASIGNADO'">
+          <label>Empleado asignado *</label>
           <select [(ngModel)]="nuevoActivo.empleadoCodigo" name="empCodigo">
-            <option value="">— Sin asignar —</option>
+            <option value="">— Selecciona un empleado —</option>
             <option *ngFor="let emp of empleados" [value]="emp.codigo">
               {{ emp.codigo }} — {{ emp.nombre }} {{ emp.apellido }}
             </option>

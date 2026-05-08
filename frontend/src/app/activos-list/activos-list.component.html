@@ -120,9 +120,9 @@
     </div>
   </div>
 
-  <!-- ── Lista completa ── -->
+  <!-- ── Lista completa agrupada por prefijo ── -->
   <div class="card">
-    <h2>Todos los Activos <span class="count-badge">{{ activos.length }}</span></h2>
+    <h2>Activos por categoría <span class="count-badge">{{ activos.length }}</span></h2>
 
     <div *ngIf="cargandoActivos" class="empty-msg">Cargando activos...</div>
 
@@ -130,42 +130,74 @@
       No hay activos registrados.
     </div>
 
-    <div class="table-wrapper" *ngIf="!cargandoActivos && activos.length > 0">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Descripción</th>
-            <th>Valor Adq.</th>
-            <th>Valor Actual</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Ubicación</th>
-            <th>Empleado</th>
-            <th *ngIf="puedeEditar">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let a of activos">
-            <td><strong>{{ a.codigo }}</strong></td>
-            <td>{{ a.descripcion }}</td>
-            <td>Q {{ a.valorAdquisicion | number:'1.2-2' }}</td>
-            <td>Q {{ a.valorActual | number:'1.2-2' }}</td>
-            <td>{{ a.fechaAdquisicion }}</td>
-            <td><span class="badge" [class]="estadoClass(a.estado)">{{ a.estado }}</span></td>
-            <td>{{ a.ubicacionActual }}</td>
-            <td>
-              <span *ngIf="a.empleadoCodigo" class="emp-chip">
-                {{ a.empleadoCodigo }} — {{ a.empleadoNombre }}
-              </span>
-              <span *ngIf="!a.empleadoCodigo" class="text-muted">—</span>
-            </td>
-            <td *ngIf="puedeEditar">
-              <button (click)="abrirEditar(a)" class="btn-edit">Editar</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div *ngIf="!cargandoActivos && secciones.length > 0" class="secciones-grid">
+      <div *ngFor="let s of secciones" class="seccion-card" [class.abierta]="estaExpandida(s.prefijo)">
+        <div class="seccion-header">
+          <div class="seccion-titulo">
+            <span class="seccion-nombre">{{ s.etiqueta }}</span>
+            <span class="seccion-prefijo">({{ s.prefijo }})</span>
+          </div>
+          <div class="seccion-resumen">
+            <span class="badge badge-asignado">Asignados: {{ s.porEstado.ASIGNADO.length }}</span>
+            <span class="badge badge-disponible">Disponibles: {{ s.porEstado.DISPONIBLE.length }}</span>
+            <span class="badge badge-baja">Baja: {{ s.porEstado.BAJA.length }}</span>
+          </div>
+          <button (click)="toggleSeccion(s.prefijo)" class="btn-primary btn-ver">
+            {{ estaExpandida(s.prefijo) ? 'Ocultar' : 'Ver' }} ({{ s.total }})
+          </button>
+        </div>
+
+        <div class="seccion-body" *ngIf="estaExpandida(s.prefijo)">
+          <ng-container *ngFor="let est of estadosOrden">
+            <div class="subseccion">
+              <h3 class="section-label">
+                <span class="badge" [class]="estadoClass(est)">{{ est }}</span>
+                <span class="count-badge">{{ s.porEstado[est].length }}</span>
+              </h3>
+
+              <div *ngIf="s.porEstado[est].length === 0" class="empty-msg">
+                Sin activos en este estado.
+              </div>
+
+              <div class="table-wrapper" *ngIf="s.porEstado[est].length > 0">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Descripción</th>
+                      <th>Valor Adq.</th>
+                      <th>Valor Actual</th>
+                      <th>Fecha</th>
+                      <th>Ubicación</th>
+                      <th>Empleado</th>
+                      <th *ngIf="puedeEditar">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let a of s.porEstado[est]">
+                      <td><strong>{{ a.codigo }}</strong></td>
+                      <td>{{ a.descripcion }}</td>
+                      <td>Q {{ a.valorAdquisicion | number:'1.2-2' }}</td>
+                      <td>Q {{ a.valorActual | number:'1.2-2' }}</td>
+                      <td>{{ a.fechaAdquisicion }}</td>
+                      <td>{{ a.ubicacionActual }}</td>
+                      <td>
+                        <span *ngIf="a.empleadoCodigo" class="emp-chip">
+                          {{ a.empleadoCodigo }} — {{ a.empleadoNombre }}
+                        </span>
+                        <span *ngIf="!a.empleadoCodigo" class="text-muted">—</span>
+                      </td>
+                      <td *ngIf="puedeEditar">
+                        <button (click)="abrirEditar(a)" class="btn-edit">Editar</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
     </div>
   </div>
 

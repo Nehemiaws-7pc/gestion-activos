@@ -8,6 +8,14 @@ import { AuthService } from '../core/services/auth.service';
 import Swal from 'sweetalert2';
 
 type SearchMode = 'empleado' | 'activo';
+type EstadoKey = 'ASIGNADO' | 'DISPONIBLE' | 'BAJA';
+
+interface SeccionActivos {
+    prefijo: string;
+    etiqueta: string;
+    total: number;
+    porEstado: Record<EstadoKey, Activo[]>;
+}
 
 @Component({
     selector: 'app-activos-list',
@@ -21,6 +29,24 @@ export class ActivosListComponent implements OnInit {
     // ── Lista general ─────────────────────────────
     activos: Activo[] = [];
     cargandoActivos = false;
+    secciones: SeccionActivos[] = [];
+    expandidos = new Set<string>();
+    readonly estadosOrden: EstadoKey[] = ['ASIGNADO', 'DISPONIBLE', 'BAJA'];
+
+    private etiquetasPrefijo: Record<string, string> = {
+        LAP: 'Laptops',
+        PC: 'Computadoras de escritorio',
+        MON: 'Monitores',
+        IMP: 'Impresoras',
+        TEL: 'Teléfonos',
+        TAB: 'Tabletas',
+        CAM: 'Cámaras',
+        PROY: 'Proyectores',
+        ESC: 'Escritorios',
+        SIL: 'Sillas',
+        VEH: 'Vehículos',
+        HER: 'Herramientas',
+    };
 
     // ── Registro ──────────────────────────────────
     nuevoActivo: Partial<Activo> = this.activoVacio();
@@ -66,9 +92,49 @@ export class ActivosListComponent implements OnInit {
     cargarActivos() {
         this.cargandoActivos = true;
         this.activoService.getAll().subscribe({
-            next: data => { this.activos = data; this.cargandoActivos = false; },
+            next: data => {
+                this.activos = data;
+                this.secciones = this.agruparPorPrefijo(data);
+                this.cargandoActivos = false;
+            },
             error: () => { Swal.fire('Error', 'No se pudo cargar la lista de activos', 'error'); this.cargandoActivos = false; }
         });
+    }
+
+    private agruparPorPrefijo(activos: Activo[]): SeccionActivos[] {
+        const mapa = new Map<string, SeccionActivos>();
+        for (const a of activos) {
+            const prefijo = this.extraerPrefijo(a.codigo);
+            let seccion = mapa.get(prefijo);
+            if (!seccion) {
+                seccion = {
+                    prefijo,
+                    etiqueta: this.etiquetasPrefijo[prefijo] ?? `Activos ${prefijo}`,
+                    total: 0,
+                    porEstado: { ASIGNADO: [], DISPONIBLE: [], BAJA: [] }
+                };
+                mapa.set(prefijo, seccion);
+            }
+            const estado = (a.estado as EstadoKey);
+            if (seccion.porEstado[estado]) seccion.porEstado[estado].push(a);
+            seccion.total++;
+        }
+        return Array.from(mapa.values()).sort((a, b) => a.prefijo.localeCompare(b.prefijo));
+    }
+
+    private extraerPrefijo(codigo: string): string {
+        if (!codigo) return 'OTROS';
+        const idx = codigo.indexOf('-');
+        return (idx > 0 ? codigo.substring(0, idx) : codigo).toUpperCase();
+    }
+
+    toggleSeccion(prefijo: string) {
+        if (this.expandidos.has(prefijo)) this.expandidos.delete(prefijo);
+        else this.expandidos.add(prefijo);
+    }
+
+    estaExpandida(prefijo: string): boolean {
+        return this.expandidos.has(prefijo);
     }
 
     // ── Registro ──────────────────────────────────

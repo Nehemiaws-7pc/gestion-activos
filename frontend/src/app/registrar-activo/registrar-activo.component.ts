@@ -32,10 +32,21 @@ export class RegistrarActivoComponent implements OnInit {
         });
     }
 
+    onEstadoChange(nuevoEstado: string) {
+        this.nuevoActivo.estado = nuevoEstado;
+        if (nuevoEstado !== 'ASIGNADO') {
+            this.nuevoActivo.empleadoCodigo = '';
+        }
+    }
+
     registrar() {
         const a = this.nuevoActivo;
         if (!a.codigo || !a.descripcion || !a.valorAdquisicion) {
             Swal.fire('Campos incompletos', 'Código, descripción y valor son obligatorios', 'warning');
+            return;
+        }
+        if (a.estado === 'ASIGNADO' && !a.empleadoCodigo) {
+            Swal.fire('Empleado requerido', 'Si el activo se va a asignar, debes seleccionar un empleado', 'warning');
             return;
         }
         this.registrando = true;
