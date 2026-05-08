@@ -1,6 +1,7 @@
 package com.gestionactivos.backend.service;
 
 import com.gestionactivos.backend.dto.ActivoDTO;
+import com.gestionactivos.backend.dto.BienAsignadoDTO;
 import com.gestionactivos.backend.dto.EmpleadoDTO;
 import com.gestionactivos.backend.model.Empleado;
 import com.gestionactivos.backend.model.Ubicacion;
@@ -36,6 +37,11 @@ public class EmpleadoService {
         return activoRepository.findByEmpleado(emp).stream()
                 .map(activoService::toDTO)
                 .toList();
+    }
+
+    public List<BienAsignadoDTO> getBienesAsignados(String codigo) {
+        findOrThrow(codigo);
+        return activoRepository.findBienesAsignadosByEmpleadoCodigo(codigo);
     }
 
     @org.springframework.transaction.annotation.Transactional

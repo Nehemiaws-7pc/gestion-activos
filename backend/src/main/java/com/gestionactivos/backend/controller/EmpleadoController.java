@@ -1,6 +1,7 @@
 package com.gestionactivos.backend.controller;
 
 import com.gestionactivos.backend.dto.ActivoDTO;
+import com.gestionactivos.backend.dto.BienAsignadoDTO;
 import com.gestionactivos.backend.dto.EmpleadoDTO;
 import com.gestionactivos.backend.service.EmpleadoService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,11 @@ public class EmpleadoController {
     @GetMapping("/{codigo}/activos")
     public ResponseEntity<List<ActivoDTO>> getActivos(@PathVariable String codigo) {
         return ResponseEntity.ok(service.getActivosDeEmpleado(codigo));
+    }
+
+    @GetMapping("/{codigo}/bienes-asignados")
+    public ResponseEntity<List<BienAsignadoDTO>> getBienesAsignados(@PathVariable String codigo) {
+        return ResponseEntity.ok(service.getBienesAsignados(codigo));
     }
 
     @GetMapping(value = "/{codigo}/qr", produces = MediaType.IMAGE_PNG_VALUE)

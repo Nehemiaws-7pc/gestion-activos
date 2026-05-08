@@ -1,0 +1,36 @@
+CONSULTA A, necesita la inversion en empleado. retornando
+el nombre_empleado, cantidad_bienes (monto total invertido):
+
+  SELECT
+      e.nombre || ' ' || COALESCE(e.apellido, '')   AS 
+  nombre_empleado,
+      COUNT(a.id)                                    AS
+   cantidad_bienes,
+      COALESCE(SUM(a.valor_adquisicion), 0)          AS
+   monto_total_invertido
+  FROM empleados e
+  LEFT JOIN activo a ON a.empleado_id = e.id AND       
+  a.estado = 'ASIGNADO'
+  GROUP BY e.id, e.nombre, e.apellido
+  ORDER BY cantidad_bienes DESC, monto_total_invertido 
+  DESC;
+
+
+
+
+  CONSULTA B, Necestia lo mismo que A, pero presentarse como: 
+  codigo_empleado, nombre_empleado, codigo_activo, descripcion_activo
+  y valor_adquisicion.
+
+
+    SELECT
+      e.codigo                                      AS codigo_empleado,
+      e.nombre || ' ' || COALESCE(e.apellido, '')   AS nombre_empleado,
+      a.codigo                                      AS codigo_bien,
+      a.descripcion                                 AS descripcion_bien,
+      a.valor_adquisicion                           AS costo_bien
+  FROM empleados e
+  INNER JOIN activo a ON a.empleado_id = e.id
+  WHERE e.codigo = ?
+    AND a.estado = 'ASIGNADO'
+  ORDER BY a.codigo;
